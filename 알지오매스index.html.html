@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알지오매스 2D 실생활 이차곡선 & 벡터 모델링 수행평가</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+            .print-card { border: 1px solid #cbd5e1 !important; box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-emerald-900 text-white shadow-md sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-emerald-600 p-2 rounded-lg">
+                    <i class="fa-solid fa-shapes text-xl text-emerald-100"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">알지오매스 2D 이차곡선 & 벡터 모델링</h1>
+                </div>
+            </div>
+
+            <!-- Global Timer & Quick Actions -->
+            <div class="flex items-center space-x-4">
+                <button onclick="saveAllData()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center space-x-1.5 shadow">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>임시 저장</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-full md:w-64 flex-shrink-0 no-print">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sticky top-20">
+                <div class="mb-4">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">평가 진행 단계</h2>
+                    <div class="mt-2 h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div id="overallProgressBar" class="h-full bg-emerald-600 transition-all duration-300" style="width: 25%"></div>
+                    </div>
+                </div>
+
+                <nav class="space-y-1" id="stepNav">
+                    <button onclick="switchTab('step1')" id="nav-step1" class="w-full flex items-center justify-between p-3 rounded-xl text-left font-medium text-sm transition bg-emerald-50 text-emerald-700 font-semibold">
+                        <span class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+                            <span>1차시: 기초 & 물체 구상</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                    <button onclick="switchTab('step2')" id="nav-step2" class="w-full flex items-center justify-between p-3 rounded-xl text-left font-medium text-sm transition text-slate-600 hover:bg-slate-50">
+                        <span class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-xs flex items-center justify-center font-bold">2</span>
+                            <span>2차시: 이차곡선 모델링</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                    <button onclick="switchTab('step3')" id="nav-step3" class="w-full flex items-center justify-between p-3 rounded-xl text-left font-medium text-sm transition text-slate-600 hover:bg-slate-50">
+                        <span class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-xs flex items-center justify-center font-bold">3</span>
+                            <span>3차시: 벡터 모델링</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                    <button onclick="switchTab('step4')" id="nav-step4" class="w-full flex items-center justify-between p-3 rounded-xl text-left font-medium text-sm transition text-slate-600 hover:bg-slate-50">
+                        <span class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-xs flex items-center justify-center font-bold">4</span>
+                            <span>4차시: 수학적 해석</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                    <button onclick="switchTab('step5')" id="nav-step5" class="w-full flex items-center justify-between p-3 rounded-xl text-left font-medium text-sm transition text-slate-600 hover:bg-slate-50">
+                        <span class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-xs flex items-center justify-center font-bold">5</span>
+                            <span>최종 성과 대시보드</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex-grow space-y-6">
+
+            <!-- STEP 1: Tutorial & Object Brainstorming -->
+            <section id="tab-step1" class="tab-content space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+                        <div>
+                            <span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-semibold">1차시 (1시간)</span>
+                            <h2 class="text-xl font-bold text-slate-800 mt-2">알지오매스 2D 기초 및 탐구 대상 물체 구상하기</h2>
+                        </div>
+                        <i class="fa-solid fa-lightbulb text-3xl text-amber-400"></i>
+                    </div>
+
+                    <!-- Task Objective -->
+                    <div class="bg-emerald-50/50 rounded-xl p-4 border border-emerald-100 mb-6 text-sm text-slate-700">
+                        <h4 class="font-bold text-emerald-900 mb-1"><i class="fa-solid fa-bullseye me-1"></i> 이번 차시의 핵심 목적</h4>
+                        <p>일상생활 속에서 볼 수 있는 물체(예: 컴퓨터 마우스, 향수병, 아치형 교량, 안경 등)를 선정하고, 이를 <strong>2D 알지오매스 좌표평면</strong> 위에서 <strong>범위가 제한된 이차곡선(원, 타원, 포물선, 쌍곡선)</strong>과 <strong>선 형태의 벡터</strong> 조합으로 표현하기 위한 초기 매핑 계획을 수립합니다.</p>
+                    </div>
+
+                    <!-- Reference Exemplar Link Banner -->
+                    <div class="bg-gradient-to-r from-emerald-900 to-slate-900 text-white p-5 rounded-xl mb-6 shadow-md border border-emerald-700">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div class="space-y-1">
+                                <span class="bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">추천 탐구 예시</span>
+                                <h3 class="font-bold text-base text-emerald-100">컴퓨터 마우스 알지오매스 2D 모델링 작품</h3>
+                                <p class="text-xs text-slate-300">실제 알지오매스 2D 환경에서 이차곡선 조건문(If)과 선 형태의 벡터를 사용하여 구현한 대표 모델링을 확인해 보세요.</p>
+                            </div>
+                            <a href="https://www.algeomath.kr/algeo/algeomath/app/view?id=8c331e3287992230396e4fea65ef4353" target="_blank" rel="noopener noreferrer" class="bg-amber-400 hover:bg-amber-300 text-slate-900 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 flex-shrink-0 shadow">
+                                <span>알지오매스 예시작품 보기</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Input Forms -->
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">1. 탐구 대상 실생활 물체명</label>
+                            <input type="text" id="step1_object_name" placeholder="예: 무선 컴퓨터 마우스, 향수병, 아치형 교량" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm">
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-sm font-semibold text-slate-700">2. 선정 이유 및 수학적 요소 분석</label>
+                                <span class="text-xs text-emerald-600 font-medium">※ 본 항목은 작품을 만드는 과정 및 마지막 단계에 작성하거나 수정하셔도 됩니다.</span>
+                            </div>
+                            <textarea id="step1_reason" rows="3" placeholder="해당 물체의 외형적 특징에서 발견할 수 있는 이차곡선(원, 포물선, 타원, 쌍곡선)과 선 형태의 벡터 요소를 기술하세요." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm"></textarea>
+                        </div>
+
+                        <!-- Dynamic Mapping Plan Container -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-semibold text-slate-700">3. 물체 구성 요소별 매핑 계획도</label>
+                                <span class="text-xs text-slate-500">부위별로 원하는 만큼 매핑 요소 항목을 추가할 수 있습니다.</span>
+                            </div>
+                            
+                            <div id="mappingContainer" class="space-y-3">
+                                <!-- Dynamic mapping rows will be added here -->
+                            </div>
+
+                            <!-- Add Mapping Button -->
+                            <div class="pt-2">
+                                <button onclick="addMappingRow()" class="w-full py-2.5 border-2 border-dashed border-emerald-300 hover:border-emerald-500 text-emerald-600 hover:text-emerald-700 font-semibold rounded-xl text-xs transition flex items-center justify-center space-x-2 bg-emerald-50/30 hover:bg-emerald-50">
+                                    <i class="fa-solid fa-plus-circle text-sm"></i>
+                                    <span>+ 매핑 계획 추가하기</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 2: Conic Sections Modeling with Dynamic Addition -->
+            <section id="tab-step2" class="tab-content hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+                        <div>
+                            <span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-semibold">2차시 (2시간)</span>
+                            <h2 class="text-xl font-bold text-slate-800 mt-2">이차곡선 모델링</h2>
+                        </div>
+                        <i class="fa-solid fa-bezier-curve text-3xl text-emerald-500"></i>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="bg-emerald-50/50 rounded-xl p-4 border border-emerald-100 mb-6 text-sm text-slate-700">
+                        <h4 class="font-bold text-emerald-900 mb-1"><i class="fa-solid fa-circle-info me-1"></i> 모델링 지침</h4>
+                        <p>선정한 물체의 외곽선 및 주요 구조를 알지오매스 2D에서 <strong>범위가 제한된 이차곡선 방정식</strong>으로 완성하세요. 물체의 복잡도에 따라 <strong>[+ 곡선 추가하기]</strong> 버튼을 눌러 원하는 만큼 곡선을 자유롭게 추가할 수 있습니다.</p>
+                    </div>
+
+                    <!-- Reference Banner Quick Link -->
+                    <div class="bg-slate-100 border border-slate-300 rounded-xl p-3 flex items-center justify-between text-xs text-slate-700 mb-4">
+                        <span class="flex items-center space-x-2">
+                            <i class="fa-solid fa-mouse text-emerald-600 text-sm"></i>
+                            <span>마우스 예시 작품의 곡선 구성이 궁금하다면? 알지오매스에서 직접 구조를 열어보세요.</span>
+                        </span>
+                        <a href="https://www.algeomath.kr/algeo/algeomath/app/view?id=8c331e3287992230396e4fea65ef4353" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-600 hover:text-emerald-800 underline flex items-center space-x-1 ml-2">
+                            <span>작품 열기</span>
+                            <i class="fa-solid fa-external-link text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Dynamic Conic List Container -->
+                    <div class="space-y-4">
+                        <div id="conicContainer" class="space-y-4">
+                            <!-- Conics will be added dynamically here -->
+                        </div>
+
+                        <!-- Add Conic Button -->
+                        <div class="pt-2">
+                            <button onclick="addConicCard()" class="w-full py-3 border-2 border-dashed border-emerald-300 hover:border-emerald-500 text-emerald-600 hover:text-emerald-700 font-semibold rounded-xl text-sm transition flex items-center justify-center space-x-2 bg-emerald-50/30 hover:bg-emerald-50">
+                                <i class="fa-solid fa-plus-circle text-base"></i>
+                                <span>+ 곡선 추가하기</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 3: 2D Vector Modeling -->
+            <section id="tab-step3" class="tab-content hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+                        <div>
+                            <span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-semibold">3차시 (1~2시간)</span>
+                            <h2 class="text-xl font-bold text-slate-800 mt-2">벡터 모델링</h2>
+                        </div>
+                        <i class="fa-solid fa-arrows-up-down-left-right text-3xl text-emerald-500"></i>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="bg-emerald-50/50 rounded-xl p-4 border border-emerald-100 mb-6 text-sm text-slate-700">
+                        <h4 class="font-bold text-emerald-900 mb-1"><i class="fa-solid fa-vector-square me-1"></i> 2D 벡터 결합 지침</h4>
+                        <p>모델링한 물체 위에 시점과 종점을 잇는 **윤곽선, 구조선, 구획선 및 연결선 역할을 하는 벡터**를 결합하세요. 필요한 만큼 **[+ 벡터 추가하기]** 버튼으로 벡터를 자유롭게 추가할 수 있습니다.</p>
+                    </div>
+
+                    <!-- Dynamic Vector List Container -->
+                    <div class="space-y-6">
+                        <div id="vectorContainer" class="space-y-4">
+                            <!-- Vectors will be added dynamically here -->
+                        </div>
+
+                        <!-- Add Vector Button -->
+                        <div class="pt-2">
+                            <button onclick="addVectorCard()" class="w-full py-3 border-2 border-dashed border-emerald-300 hover:border-emerald-500 text-emerald-600 hover:text-emerald-700 font-semibold rounded-xl text-sm transition flex items-center justify-center space-x-2 bg-emerald-50/30 hover:bg-emerald-50">
+                                <i class="fa-solid fa-plus-circle text-base"></i>
+                                <span>+ 벡터 추가하기</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 4: Detailed Mathematical Reasoning -->
+            <section id="tab-step4" class="tab-content hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="pb-4 border-b border-slate-100 mb-6">
+                        <span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-semibold">4차시 (1~2시간)</span>
+                        <h2 class="text-xl font-bold text-slate-800 mt-2">수학적 근거 및 결과 해석</h2>
+                        <p class="text-sm text-slate-500 mt-2">결과를 단순히 설명하는 데 그치지 말고, 사용한 식과 좌표, 성질을 근거로 왜 그렇게 판단했는지 구체적으로 작성하세요.</p>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">[1] 이차곡선의 연결과 대칭성에 대한 수학적 근거</label>
+                            <p class="text-xs text-slate-500 mb-2">곡선의 방정식과 정의역·치역, 경계점의 좌표를 활용해 연결 상태를 설명하세요. 대칭성이 있다면 식이나 좌표가 이를 어떻게 보여 주는지도 적으세요.</p>
+                            <textarea id="step3_analysis_1" rows="5" placeholder="예: 두 곡선의 경계 x좌표를 각각 대입해 y값을 비교했다. 경계에서 두 함수의 값이 같으므로 연결되며, ..." class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">[2] 벡터의 시점·종점과 성분을 활용한 구조적 해석</label>
+                            <p class="text-xs text-slate-500 mb-2">시점과 종점의 좌표 차이로 벡터 성분을 구하고, 방향과 크기가 물체의 어떤 구조를 표현하는지 근거를 들어 설명하세요.</p>
+                            <textarea id="step3_analysis_2" rows="5" placeholder="예: 시점이 (x₁,y₁), 종점이 (x₂,y₂)이므로 벡터 성분은 (x₂−x₁, y₂−y₁)이다. 따라서 ..." class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">[3] 모델링 결과의 타당성 및 한계</label>
+                            <p class="text-xs text-slate-500 mb-2">실제 물체와 모델의 차이, 좌표나 계수 조정의 영향, 더 정확하게 표현하기 위해 필요한 개선점을 수학적으로 설명하세요.</p>
+                            <textarea id="step3_analysis_3" rows="5" placeholder="예: 곡선의 범위를 제한해 실제 외곽과 비슷하게 만들었지만, ..." class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 5: Final Portfolio Dashboard -->
+            <section id="tab-step5" class="tab-content hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+                        <div>
+                            <span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-semibold">최종 정리</span>
+                            <h2 class="text-xl font-bold text-slate-800 mt-2">최종 성과 포트폴리오</h2>
+                        </div>
+                        <div class="flex space-x-2 no-print">
+                            <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center space-x-1.5 shadow">
+                                <i class="fa-solid fa-print"></i>
+                                <span>포트폴리오 인쇄 / PDF 저장</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submission Fields -->
+                    <div class="space-y-4 mb-8 no-print">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">학생 이름 및 학번</label>
+                                <input type="text" id="student_info" placeholder="예: 2학년 3반 15번 홍길동" class="w-full px-4 py-2 rounded-xl border border-slate-300 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">알지오매스 2D 공유 링크 (URL)</label>
+                                <input type="text" id="algeomath_url" placeholder="https://www.algeomath.kr/..." class="w-full px-4 py-2 rounded-xl border border-slate-300 text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- UNIFIED PORTFOLIO BOARD ( printable ) -->
+                    <div id="portfolioDashboard" class="border-2 border-emerald-100 rounded-2xl p-6 bg-slate-50/50 space-y-6 print-card">
+                        <div class="text-center pb-4 border-b border-slate-200">
+                            <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest">Algeomath 2D Conics & Vectors Portfolio</span>
+                            <h1 class="text-2xl font-black text-slate-900 mt-1" id="disp_object_name">실생활 물체 모델링 최종 보고서</h1>
+                            <p class="text-xs text-slate-500 mt-1" id="disp_student_info">제출자: 미입력</p>
+                        </div>
+
+                        <!-- Grid Summary -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-emerald-900 text-sm border-b pb-1"><i class="fa-solid fa-cube me-1"></i> 모델링 대상 및 계획</h4>
+                                <p><strong>대상 물체:</strong> <span id="disp_obj"></span></p>
+                                <p><strong>선정 이유 및 분석:</strong> <span id="disp_reason"></span></p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-emerald-900 text-sm border-b pb-1"><i class="fa-solid fa-link me-1"></i> 알지오매스 2D 링크</h4>
+                                <p class="break-all font-mono text-emerald-600" id="disp_url">링크가 제출되지 않음</p>
+                            </div>
+                        </div>
+
+                        <!-- Initial Mapping Plan Summary -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3 text-xs">
+                            <h4 class="font-bold text-emerald-900 text-sm border-b pb-1"><i class="fa-solid fa-table-list me-1"></i> 1차시 초기 매핑 계획도</h4>
+                            <div id="disp_mapping_list" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <!-- Dynamic mapping summary -->
+                            </div>
+                        </div>
+
+                        <!-- Applied Conics Summary -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3 text-xs">
+                            <h4 class="font-bold text-emerald-900 text-sm border-b pb-1"><i class="fa-solid fa-square-root-variable me-1"></i> 적용된 범위 제한 이차곡선 방정식</h4>
+                            <div id="disp_conics_list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <!-- Dynamic conics summary -->
+                            </div>
+                        </div>
+
+                        <!-- Applied Vectors Summary -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3 text-xs">
+                            <h4 class="font-bold text-emerald-900 text-sm border-b pb-1"><i class="fa-solid fa-arrows-to-dot me-1"></i> 적용된 벡터 모음</h4>
+                            <div id="disp_vectors_list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <!-- Dynamic vectors summary -->
+                            </div>
+                        </div>
+
+                        <!-- Structured Analysis Summary -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3 text-xs">
+                            <h4 class="font-bold text-emerald-900 text-sm border-b pb-1"><i class="fa-solid fa-align-left me-1"></i> 종합 수학적 해석 및 분석 보고</h4>
+                            <div class="space-y-2">
+                                <p><strong>[1] 곡선 결합의 연속성 및 대칭성:</strong></p>
+                                <p class="text-slate-700 bg-slate-50 p-2.5 rounded border" id="disp_ans1">-</p>
+                                <p><strong>[2] 벡터의 시점·종점 구조적 역할:</strong></p>
+                                <p class="text-slate-700 bg-slate-50 p-2.5 rounded border" id="disp_ans2">-</p>
+                                <p><strong>[3] 종합 해석 및 탐구 소감:</strong></p>
+                                <p class="text-slate-700 bg-slate-50 p-2.5 rounded border" id="disp_ans3">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-4 text-center text-xs text-slate-400 no-print">
+        <p>알지오매스 2D 기반 이차곡선 & 벡터 수행평가 플랫폼 | 고등학교 기하 및 전문수학</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let mappingCount = 0;
+        let conicCount = 0;
+        let vectorCount = 0;
+
+        // Dynamic Mapping Row Addition (Step 1)
+        function addMappingRow(data = null) {
+            mappingCount++;
+            const id = mappingCount;
+            const container = document.getElementById('mappingContainer');
+
+            const mappingHtml = `
+                <div id="mapping_row_${id}" class="p-3 border border-slate-200 rounded-xl bg-slate-50 relative space-y-2">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                        <span class="font-bold text-xs text-emerald-900"><i class="fa-solid fa-layer-group me-1"></i> 매핑 계획 #${id}</span>
+                        <button onclick="removeMappingRow(${id})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 transition">
+                            <i class="fa-solid fa-trash"></i> 삭제
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">물체의 부위</label>
+                            <input type="text" id="map_part_${id}" value="${data ? data.part : ''}" placeholder="예: 상단 헤드, 스크롤 휠, 클릭 버튼" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">사용할 2D 수학 요소</label>
+                            <input type="text" id="map_math_${id}" value="${data ? data.math : ''}" placeholder="예: 제한된 원, 포물선, 벡터" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">예상 형태 및 범위 제한 방식</label>
+                            <input type="text" id="map_desc_${id}" value="${data ? data.desc : ''}" placeholder="예: x^2 + y^2 = 4 (-2 <= x <= 2)" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', mappingHtml);
+        }
+
+        function removeMappingRow(id) {
+            const row = document.getElementById(`mapping_row_${id}`);
+            if (row) row.remove();
+        }
+
+        // Dynamic Conic Addition (Step 2)
+        function addConicCard(data = null) {
+            conicCount++;
+            const id = conicCount;
+            const container = document.getElementById('conicContainer');
+
+            const conicHtml = `
+                <div id="conic_card_${id}" class="p-4 border border-slate-200 rounded-xl bg-slate-50 space-y-3 relative">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-sm text-emerald-900"><i class="fa-solid fa-pen-nib me-1"></i> 곡선 #${id}</span>
+                        <div class="flex items-center space-x-2">
+                            <select id="conic_type_${id}" class="text-xs bg-white border border-slate-300 rounded-lg px-2 py-1">
+                                <option value="원 (Circle)" ${data && data.type === '원 (Circle)' ? 'selected' : ''}>원 (Circle)</option>
+                                <option value="타원 (Ellipse)" ${data && data.type === '타원 (Ellipse)' ? 'selected' : ''}>타원 (Ellipse)</option>
+                                <option value="포물선 (Parabola)" ${data && data.type === '포물선 (Parabola)' ? 'selected' : ''}>포물선 (Parabola)</option>
+                                <option value="쌍곡선 (Hyperbola)" ${data && data.type === '쌍곡선 (Hyperbola)' ? 'selected' : ''}>쌍곡선 (Hyperbola)</option>
+                            </select>
+                            <button onclick="removeConicCard(${id})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 transition">
+                                <i class="fa-solid fa-trash"></i> 삭제
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">기본 방정식</label>
+                            <input type="text" id="eq_${id}" value="${data ? data.eq : ''}" placeholder="예: (x-1)^2 + (y-2)^2 = 9" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">범위 제한 조건</label>
+                            <input type="text" id="domain_${id}" value="${data ? data.domain : ''}" placeholder="예: -2 <= x <= 4" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">기하학적 요소 (초점/꼭짓점/중심)</label>
+                            <input type="text" id="props_${id}" value="${data ? data.props : ''}" placeholder="예: 중심 (1, 2), 반지름 r=3" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">담당하는 물체의 부위</label>
+                            <input type="text" id="role_${id}" value="${data ? data.role : ''}" placeholder="예: 컴퓨터 마우스 상단 곡면" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="conic_reason_${id}" class="block font-semibold text-slate-600 mb-1 text-xs">이 이차곡선을 선택한 이유</label>
+                        <textarea id="conic_reason_${id}" rows="2" placeholder="예: 이 곡선이 물체의 어떤 부분을 잘 표현하는지, 이 곡선을 선택한 이유를 적어 보세요." class="w-full p-2 border rounded-lg bg-white text-xs">${data ? (data.reason || '') : ''}</textarea>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', conicHtml);
+        }
+
+        function removeConicCard(id) {
+            const card = document.getElementById(`conic_card_${id}`);
+            if (card) card.remove();
+        }
+
+        // Dynamic Vector Addition (Step 3)
+        function addVectorCard(data = null) {
+            vectorCount++;
+            const id = vectorCount;
+            const container = document.getElementById('vectorContainer');
+
+            const vectorHtml = `
+                <div id="vector_card_${id}" class="p-4 border border-slate-200 rounded-xl bg-slate-50 space-y-3 relative">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-sm text-emerald-900"><i class="fa-solid fa-arrow-right me-1"></i> 벡터 #${id}</span>
+                        <button onclick="removeVectorCard(${id})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 transition">
+                            <i class="fa-solid fa-trash"></i> 삭제
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">시점 및 종점 좌표</label>
+                            <input type="text" id="vec_pts_${id}" value="${data ? data.pts : ''}" placeholder="시점 (0, -5), 종점 (0, 5)" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">성분 표시 v = (v1, v2)</label>
+                            <input type="text" id="vec_comp_${id}" value="${data ? data.comp : ''}" placeholder="v = (0, 10)" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">구조적/디자인적 의미 (선 역할)</label>
+                            <input type="text" id="vec_meaning_${id}" value="${data ? data.meaning : ''}" placeholder="예: 마우스 좌우 대칭 기준선" class="w-full p-2 border rounded-lg bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="vec_reason_${id}" class="block font-semibold text-slate-600 mb-1 text-xs">이 벡터를 선택한 이유</label>
+                        <textarea id="vec_reason_${id}" rows="2" placeholder="예: 이 벡터가 물체의 어떤 구조나 방향을 나타내는 데 적합한지 적어 보세요." class="w-full p-2 border rounded-lg bg-white text-xs">${data ? (data.reason || '') : ''}</textarea>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', vectorHtml);
+        }
+
+        function removeVectorCard(id) {
+            const card = document.getElementById(`vector_card_${id}`);
+            if (card) card.remove();
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('#stepNav button').forEach(el => {
+                el.classList.remove('bg-emerald-50', 'text-emerald-700', 'font-semibold');
+                el.classList.add('text-slate-600');
+            });
+
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            const targetNav = document.getElementById('nav-' + tabId);
+            if (targetNav) {
+                targetNav.classList.add('bg-emerald-50', 'text-emerald-700', 'font-semibold');
+            }
+
+            // Update progress bar width
+            const progressBar = document.getElementById('overallProgressBar');
+            if (tabId === 'step1') progressBar.style.width = '25%';
+            else if (tabId === 'step2') progressBar.style.width = '50%';
+            else if (tabId === 'step3') progressBar.style.width = '75%';
+            else if (tabId === 'step4') progressBar.style.width = '85%';
+            else if (tabId === 'step5') {
+                progressBar.style.width = '100%';
+                updatePortfolioView();
+            }
+
+        }
+
+        // Data LocalStorage Auto-Save & Sync
+        function saveAllData() {
+            // Collect mapping rows
+            const mappings = [];
+            for (let i = 1; i <= mappingCount; i++) {
+                const row = document.getElementById(`mapping_row_${i}`);
+                if (row) {
+                    mappings.push({
+                        part: document.getElementById(`map_part_${i}`).value,
+                        math: document.getElementById(`map_math_${i}`).value,
+                        desc: document.getElementById(`map_desc_${i}`).value
+                    });
+                }
+            }
+
+            // Collect conics
+            const conics = [];
+            for (let i = 1; i <= conicCount; i++) {
+                const card = document.getElementById(`conic_card_${i}`);
+                if (card) {
+                    conics.push({
+                        type: document.getElementById(`conic_type_${i}`).value,
+                        eq: document.getElementById(`eq_${i}`).value,
+                        domain: document.getElementById(`domain_${i}`).value,
+                        props: document.getElementById(`props_${i}`).value,
+                        role: document.getElementById(`role_${i}`).value,
+                        reason: document.getElementById(`conic_reason_${i}`).value
+                    });
+                }
+            }
+
+            // Collect vectors
+            const vectors = [];
+            for (let i = 1; i <= vectorCount; i++) {
+                const card = document.getElementById(`vector_card_${i}`);
+                if (card) {
+                    vectors.push({
+                        pts: document.getElementById(`vec_pts_${i}`).value,
+                        comp: document.getElementById(`vec_comp_${i}`).value,
+                        meaning: document.getElementById(`vec_meaning_${i}`).value,
+                        reason: document.getElementById(`vec_reason_${i}`).value
+                    });
+                }
+            }
+
+            const data = {
+                objName: document.getElementById('step1_object_name').value,
+                reason: document.getElementById('step1_reason').value,
+                mappings: mappings,
+                conics: conics,
+                vectors: vectors,
+                ans1: document.getElementById('step3_analysis_1').value,
+                ans2: document.getElementById('step3_analysis_2').value,
+                ans3: document.getElementById('step3_analysis_3').value,
+                student: document.getElementById('student_info').value,
+                url: document.getElementById('algeomath_url').value
+            };
+            localStorage.setItem('algeo2d_assessment_data_v4', JSON.stringify(data));
+            alert('모든 입력 내용이 로컬 저장소에 저장되었습니다.');
+        }
+
+        function loadSavedData() {
+            const raw = localStorage.getItem('algeo2d_assessment_data_v4');
+            if (!raw) {
+                // Initialize default dynamic rows
+                addMappingRow({ part: '상단 헤드', math: '제한된 타원', desc: 'x^2 + 2y^2 = 4 (-1.5 <= x <= 1.5)' });
+                addMappingRow({ part: '하단 베이스', math: '포물선', desc: 'y = -x^2 + 2 (-1 <= x <= 1)' });
+                addMappingRow({ part: '중심 대칭축', math: '벡터', desc: '시점 (0, -5), 종점 (0, 5)' });
+
+                addConicCard();
+                addConicCard();
+                addVectorCard();
+                return;
+            }
+            const data = JSON.parse(raw);
+            if (data.objName) document.getElementById('step1_object_name').value = data.objName;
+            if (data.reason) document.getElementById('step1_reason').value = data.reason;
+            if (data.ans1) document.getElementById('step3_analysis_1').value = data.ans1;
+            if (data.ans2) document.getElementById('step3_analysis_2').value = data.ans2;
+            if (data.ans3) document.getElementById('step3_analysis_3').value = data.ans3;
+            if (data.student) document.getElementById('student_info').value = data.student;
+            if (data.url) document.getElementById('algeomath_url').value = data.url;
+
+            // Load mapping plan
+            if (data.mappings && data.mappings.length > 0) {
+                data.mappings.forEach(m => addMappingRow(m));
+            } else {
+                addMappingRow();
+            }
+
+            // Load conics
+            if (data.conics && data.conics.length > 0) {
+                data.conics.forEach(c => addConicCard(c));
+            } else {
+                addConicCard();
+                addConicCard();
+            }
+
+            // Load vectors
+            if (data.vectors && data.vectors.length > 0) {
+                data.vectors.forEach(v => addVectorCard(v));
+            } else {
+                addVectorCard();
+            }
+        }
+
+        // Live Portfolio Display Updates
+        function updatePortfolioView() {
+            document.getElementById('disp_object_name').innerText = (document.getElementById('step1_object_name').value || '실생활 물체') + ' 모델링 보고서';
+            document.getElementById('disp_student_info').innerText = '제출자: ' + (document.getElementById('student_info').value || '미입력');
+            document.getElementById('disp_obj').innerText = document.getElementById('step1_object_name').value || '-';
+            document.getElementById('disp_reason').innerText = document.getElementById('step1_reason').value || '-';
+            document.getElementById('disp_url').innerText = document.getElementById('algeomath_url').value || '제출된 URL 없음';
+
+            // Summary of Mappings
+            const mappingSummaryContainer = document.getElementById('disp_mapping_list');
+            mappingSummaryContainer.innerHTML = '';
+            let validMapCount = 0;
+
+            for (let i = 1; i <= mappingCount; i++) {
+                const row = document.getElementById(`mapping_row_${i}`);
+                if (row) {
+                    validMapCount++;
+                    const part = document.getElementById(`map_part_${i}`).value || '부위 미입력';
+                    const math = document.getElementById(`map_math_${i}`).value || '수학요소 미입력';
+                    const desc = document.getElementById(`map_desc_${i}`).value || '설명 미입력';
+
+                    const itemHtml = `
+                        <div class="bg-slate-50 p-2.5 rounded border">
+                            <span class="font-bold text-slate-700 block">매핑 #${validMapCount} - ${part}</span>
+                            <p class="text-emerald-700 font-medium mt-0.5">요소: ${math}</p>
+                            <p class="text-slate-500 text-[11px] mt-0.5">${desc}</p>
+                        </div>
+                    `;
+                    mappingSummaryContainer.insertAdjacentHTML('beforeend', itemHtml);
+                }
+            }
+
+            // Summary of Conics
+            const conicSummaryContainer = document.getElementById('disp_conics_list');
+            conicSummaryContainer.innerHTML = '';
+            let validConicCount = 0;
+
+            for (let i = 1; i <= conicCount; i++) {
+                const card = document.getElementById(`conic_card_${i}`);
+                if (card) {
+                    validConicCount++;
+                    const type = document.getElementById(`conic_type_${i}`).value;
+                    const eq = document.getElementById(`eq_${i}`).value || '식 미입력';
+                    const domain = document.getElementById(`domain_${i}`).value || '범위 미입력';
+                    const role = document.getElementById(`role_${i}`).value || '역할 미입력';
+                    const reason = document.getElementById(`conic_reason_${i}`).value || '선택 이유 미작성';
+
+                    const itemHtml = `
+                        <div class="bg-slate-50 p-2.5 rounded border">
+                            <span class="font-bold text-slate-700 block">곡선 #${validConicCount} (${type}) - ${role}</span>
+                            <p class="font-mono text-emerald-700 mt-1">방정식: ${eq}</p>
+                            <p class="text-slate-500 font-mono">범위: ${domain}</p>
+                            <p class="text-slate-600 mt-1"><strong>선택 이유:</strong> ${reason}</p>
+                        </div>
+                    `;
+                    conicSummaryContainer.insertAdjacentHTML('beforeend', itemHtml);
+                }
+            }
+
+            // Summary of Vectors
+            const vectorSummaryContainer = document.getElementById('disp_vectors_list');
+            vectorSummaryContainer.innerHTML = '';
+            let validVectorCount = 0;
+
+            for (let i = 1; i <= vectorCount; i++) {
+                const card = document.getElementById(`vector_card_${i}`);
+                if (card) {
+                    validVectorCount++;
+                    const pts = document.getElementById(`vec_pts_${i}`).value || '좌표 미입력';
+                    const comp = document.getElementById(`vec_comp_${i}`).value || '성분 미입력';
+                    const meaning = document.getElementById(`vec_meaning_${i}`).value || '의미 미입력';
+                    const reason = document.getElementById(`vec_reason_${i}`).value || '선택 이유 미작성';
+
+                    const itemHtml = `
+                        <div class="bg-slate-50 p-2.5 rounded border">
+                            <span class="font-bold text-slate-700 block">벡터 #${validVectorCount} (${meaning})</span>
+                            <p class="font-mono text-emerald-700 mt-1">좌표: ${pts}</p>
+                            <p class="text-slate-500 font-mono">성분: ${comp}</p>
+                            <p class="text-slate-600 mt-1"><strong>선택 이유:</strong> ${reason}</p>
+                        </div>
+                    `;
+                    vectorSummaryContainer.insertAdjacentHTML('beforeend', itemHtml);
+                }
+            }
+
+            // Answers Summary
+            document.getElementById('disp_ans1').innerText = document.getElementById('step3_analysis_1').value || '내용 미작성';
+            document.getElementById('disp_ans2').innerText = document.getElementById('step3_analysis_2').value || '내용 미작성';
+            document.getElementById('disp_ans3').innerText = document.getElementById('step3_analysis_3').value || '내용 미작성';
+        }
+
+        window.onload = function() {
+            loadSavedData();
+        };
+    </script>
+</body>
+</html>
